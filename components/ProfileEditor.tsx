@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Card, Input, TextArea, Button } from './UI';
 import { ResumeData, SupportedLanguage, EducationItem } from '../types';
 import { translations } from '../utils/translations';
@@ -13,6 +13,16 @@ interface ProfileEditorProps {
 export const ProfileEditor: React.FC<ProfileEditorProps> = ({ resumeData, onUpdate, language }) => {
   const t = translations[language];
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cropImageRef = useRef<HTMLImageElement>(null);
+
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [cropZoom, setCropZoom] = useState(1);
+  const [cropOffset, setCropOffset] = useState({ x: 0, y: 0 });
+  const [cropDragStart, setCropDragStart] = useState<{ x: number; y: number } | null>(null);
+  const [cropDragOffset, setCropDragOffset] = useState({ x: 0, y: 0 });
+  const [cropImageSize, setCropImageSize] = useState<{ width: number; height: number } | null>(null);
+
+  const CROP_SIZE = 240;
 
   const updateProfile = (field: keyof ResumeData['profile'], value: string) => {
     onUpdate({
@@ -25,10 +35,110 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ resumeData, onUpda
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        updateProfile('avatar', reader.result as string);
+        setCropSrc(reader.result as string);
+        setCropZoom(1);
+        setCropOffset({ x: 0, y: 0 });
+        setCropImageSize(null);
       };
       reader.readAsDataURL(file);
     }
+    e.target.value = '';
+  };
+
+  const clampOffset = (offset: { x: number; y: number }, zoom = cropZoom) => {
+    if (!cropImageSize) return offset;
+    const baseScale = Math.max(CROP_SIZE / cropImageSize.width, CROP_SIZE / cropImageSize.height);
+    const scale = baseScale * zoom;
+    const displayWidth = cropImageSize.width * scale;
+    const displayHeight = cropImageSize.height * scale;
+    const maxX = Math.max(0, (displayWidth - CROP_SIZE) / 2);
+    const maxY = Math.max(0, (displayHeight - CROP_SIZE) / 2);
+
+    return {
+      x: Math.min(maxX, Math.max(-maxX, offset.x)),
+      y: Math.min(maxY, Math.max(-maxY, offset.y))
+    };
+  };
+
+  const handleCropPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!cropImageSize) return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setCropDragStart({ x: event.clientX, y: event.clientY });
+    setCropDragOffset(cropOffset);
+  };
+
+  const handleCropPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!cropDragStart) return;
+    const nextOffset = {
+      x: cropDragOffset.x + (event.clientX - cropDragStart.x),
+      y: cropDragOffset.y + (event.clientY - cropDragStart.y)
+    };
+    setCropOffset(clampOffset(nextOffset));
+  };
+
+  const handleCropPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (cropDragStart) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    setCropDragStart(null);
+  };
+
+  const handleCropZoomChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const nextZoom = Number(event.target.value);
+    setCropZoom(nextZoom);
+    setCropOffset((prev) => clampOffset(prev, nextZoom));
+  };
+
+  const handleCropCancel = () => {
+    setCropSrc(null);
+  };
+
+  const handleCropReset = () => {
+    setCropZoom(1);
+    setCropOffset({ x: 0, y: 0 });
+  };
+
+  const handleCropApply = () => {
+    if (!cropSrc || !cropImageSize || !cropImageRef.current) {
+      setCropSrc(null);
+      return;
+    }
+
+    const baseScale = Math.max(CROP_SIZE / cropImageSize.width, CROP_SIZE / cropImageSize.height);
+    const scale = baseScale * cropZoom;
+    const displayWidth = cropImageSize.width * scale;
+    const displayHeight = cropImageSize.height * scale;
+    const imageLeft = CROP_SIZE / 2 - displayWidth / 2 + cropOffset.x;
+    const imageTop = CROP_SIZE / 2 - displayHeight / 2 + cropOffset.y;
+    const cropX = (0 - imageLeft) / scale;
+    const cropY = (0 - imageTop) / scale;
+    const cropW = CROP_SIZE / scale;
+    const cropH = CROP_SIZE / scale;
+    const safeX = Math.max(0, Math.min(cropX, cropImageSize.width - cropW));
+    const safeY = Math.max(0, Math.min(cropY, cropImageSize.height - cropH));
+
+    const canvas = document.createElement('canvas');
+    const outputSize = 512;
+    canvas.width = outputSize;
+    canvas.height = outputSize;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.drawImage(
+      cropImageRef.current,
+      safeX,
+      safeY,
+      cropW,
+      cropH,
+      0,
+      0,
+      outputSize,
+      outputSize
+    );
+
+    updateProfile('avatar', canvas.toDataURL('image/png'));
+    setCropSrc(null);
   };
 
   // Education Helpers
@@ -181,6 +291,73 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ resumeData, onUpda
             </Card>
         </div>
       </div>
+
+      {cropSrc && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl">
+            <div className="mb-6 flex items-start justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">{t.profile.cropTitle}</h3>
+                <p className="text-sm text-gray-500 mt-1">{t.profile.cropHint}</p>
+              </div>
+            </div>
+
+            <div className="flex justify-center">
+              <div
+                className="relative rounded-2xl bg-gray-100 overflow-hidden cursor-grab active:cursor-grabbing"
+                style={{ width: CROP_SIZE, height: CROP_SIZE, touchAction: 'none' }}
+                onPointerDown={handleCropPointerDown}
+                onPointerMove={handleCropPointerMove}
+                onPointerUp={handleCropPointerUp}
+                onPointerLeave={handleCropPointerUp}
+              >
+                <img
+                  ref={cropImageRef}
+                  src={cropSrc}
+                  alt="Crop"
+                  draggable={false}
+                  onLoad={(event) => {
+                    const img = event.currentTarget;
+                    setCropImageSize({ width: img.naturalWidth, height: img.naturalHeight });
+                    setCropOffset({ x: 0, y: 0 });
+                  }}
+                  className="absolute select-none"
+                  style={{
+                    left: '50%',
+                    top: '50%',
+                    transform: `translate(-50%, -50%) translate(${cropOffset.x}px, ${cropOffset.y}px)`,
+                    width: cropImageSize
+                      ? cropImageSize.width * Math.max(CROP_SIZE / cropImageSize.width, CROP_SIZE / cropImageSize.height) * cropZoom
+                      : 'auto',
+                    height: cropImageSize
+                      ? cropImageSize.height * Math.max(CROP_SIZE / cropImageSize.width, CROP_SIZE / cropImageSize.height) * cropZoom
+                      : 'auto'
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 space-y-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-400">{t.profile.cropZoom}</label>
+              <input
+                type="range"
+                min="1"
+                max="3"
+                step="0.01"
+                value={cropZoom}
+                onChange={handleCropZoomChange}
+                className="w-full accent-gray-900"
+              />
+            </div>
+
+            <div className="mt-6 flex flex-wrap gap-3 justify-end">
+              <Button variant="ghost" onClick={handleCropCancel}>{t.common.cancel}</Button>
+              <Button variant="secondary" onClick={handleCropReset}>{t.preview.reset}</Button>
+              <Button onClick={handleCropApply}>{t.common.save}</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

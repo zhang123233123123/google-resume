@@ -71,7 +71,7 @@ export interface AppState {
 
 // Initial Data
 export const INITIAL_RESUME: ResumeData = {
-  language: 'en',
+  language: 'zh',
   template: 'modern',
   profile: {
     name: "Dr. Alex Doe",
@@ -80,7 +80,7 @@ export const INITIAL_RESUME: ResumeData = {
     location: "San Francisco, CA",
     summary: "Senior Software Engineer with 8+ years of experience in full-stack development. Proven track record of leading teams and delivering scalable solutions.",
     // Default placeholder avatar (Simple geometric person)
-    avatar: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YxZjVZjkiLz48Y2lyY2xlIGN4PSIxMDAiIGN5PSI3MCIgcj0iNTAiIGZpbGw9IiMzMzQxNTUiLz48cGF0aCBkPSJNMTAwIDEzMGMtNTAgMC04MCAzMC04MCA3MGgxNjBjMC00MC0zMC03MC04MC03MHoiIGZpbGw9IiMzMzQxNTUiLz48L3N2Zz4="
+    avatar: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YxZjVmOSIvPjxjaXJjbGUgY3g9IjEwMCIgY3k9IjcwIiByPSI1MCIgZmlsbD0iIzMzNDE1NSIvPjxwYXRoIGQ9Ik0xMDAgMTMwYy01MCAwLTgwIDMwLTgwIDcwaDE2MGMwLTQwLTMwLTcwLTgwLTcweiIgZmlsbD0iIzMzNDE1NSIvPjwvc3ZnPg=="
   },
   education: [
     { id: '1', school: "Stanford University", degree: "Ph.D. Computer Science (AI & ML)", year: "2019" },

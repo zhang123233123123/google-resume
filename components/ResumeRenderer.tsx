@@ -96,9 +96,13 @@ const GlacialLayout: React.FC<{ data: ResumeData; isRTL: boolean; isEditable?: b
       <div className="flex-1 p-10">
          <div className="mb-8">
             <h3 className="text-lg font-bold text-gray-900 border-b border-gray-200 pb-2 mb-4">Profile</h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              <Editable isEditable={isEditable} value={data.profile.summary} onChange={v => onUpdate?.({ profile: {...data.profile, summary: v} })} tagName="p" />
-            </p>
+            <Editable
+              isEditable={isEditable}
+              value={data.profile.summary}
+              onChange={v => onUpdate?.({ profile: {...data.profile, summary: v} })}
+              tagName="p"
+              className="text-gray-600 text-sm leading-relaxed"
+            />
          </div>
 
          <div>

@@ -32,7 +32,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onChangeV
   ] as const;
 
   return (
-    <div className="min-h-screen flex font-sans selection:bg-indigo-500/30 selection:text-indigo-900 overflow-hidden relative" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="h-screen flex font-sans selection:bg-indigo-500/30 selection:text-indigo-900 overflow-hidden relative" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       
       {/* --- Premium Background Effects --- */}
       <div className="fixed inset-0 z-[-1] bg-[#fbfbfd]">
@@ -105,7 +105,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onChangeV
       </aside>
 
       {/* Main Content */}
-      <main className={`flex-1 ${language === 'ar' ? 'mr-20 lg:mr-72' : 'ml-20 lg:ml-72'} relative min-h-screen overflow-x-hidden overflow-y-auto`}>
+      <main className={`flex-1 ${language === 'ar' ? 'mr-20 lg:mr-72' : 'ml-20 lg:ml-72'} relative min-h-0 overflow-x-hidden overflow-y-auto`}>
         <div className="max-w-7xl mx-auto p-6 lg:p-12 pb-32">
           {children}
         </div>

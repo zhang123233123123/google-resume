@@ -1,5 +1,5 @@
 {
   "name": "ResumeAI - Pro Builder",
-  "description": "An elegant, AI-powered resume builder that structures your messy experience into a professional CV using Gemini 2.5.",
+  "description": "An elegant, AI-powered resume builder that structures your messy experience into a professional CV using DeepSeek.",
   "requestFramePermissions": []
 }

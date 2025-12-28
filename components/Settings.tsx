@@ -41,14 +41,14 @@ export const Settings: React.FC<SettingsProps> = ({
             </div>
             <div className="flex-1 space-y-4">
               <div>
-                <h3 className="font-bold text-gray-900">Gemini API Key</h3>
+                <h3 className="font-bold text-gray-900">DeepSeek API Key</h3>
                 <p className="text-sm text-gray-500 mt-1">
                   Your key is stored locally in your browser.
                 </p>
               </div>
               <Input 
                 type="password"
-                placeholder="AIzaSy..."
+                placeholder="sk-..."
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 className="font-mono text-xs tracking-wider"
@@ -94,7 +94,7 @@ export const Settings: React.FC<SettingsProps> = ({
               </div>
               <Input 
                 type="text"
-                placeholder="https://generativelanguage.googleapis.com"
+                placeholder="https://api.deepseek.com"
                 value={apiBaseUrl}
                 onChange={(e) => setApiBaseUrl(e.target.value)}
                 className="font-mono text-xs text-blue-600"

@@ -1,9 +1,14 @@
 import React, { useState, useRef } from 'react';
+import * as mammoth from 'mammoth';
+import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
+import pdfWorker from 'pdfjs-dist/build/pdf.worker?url';
 import { UploadCloud, Wand2, Trash2, Plus, Target, Sparkles, Edit3, Save, XCircle, AlertTriangle, FileType, FileText, File as FileIcon } from 'lucide-react';
 import { ExperienceItem, LoadingState, ResumeData, SupportedLanguage } from '../types';
 import { Button, Card, TextArea, Input } from './UI';
-import { parseMasterProfile, tailorResumeToJob, optimizeSingleExperience } from '../services/geminiService';
+import { parseMasterProfile, tailorResumeToJob, optimizeSingleExperience } from '../services/deepseekService';
 import { translations } from '../utils/translations';
+
+GlobalWorkerOptions.workerSrc = pdfWorker;
 
 interface ExperienceEditorProps {
   resumeData: ResumeData;
@@ -26,7 +31,6 @@ export const ExperienceEditor: React.FC<ExperienceEditorProps> = ({
   const t = translations[language];
   const [rawText, setRawText] = useState('');
   
-  const [fileData, setFileData] = useState<{ mimeType: string; data: string } | null>(null);
   const [fileName, setFileName] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -36,68 +40,79 @@ export const ExperienceEditor: React.FC<ExperienceEditorProps> = ({
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const extractPdfText = async (data: ArrayBuffer) => {
+    const pdf = await getDocument({ data }).promise;
+    const pages: string[] = [];
+
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
+      const textItems = content.items as Array<{ str?: string }>;
+      const pageText = textItems.map((item) => item.str || '').join(' ').trim();
+      if (pageText) pages.push(pageText);
+    }
+
+    return pages.join('\n\n');
+  };
+
   // --- IMPROVED FILE HANDLER ---
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    const input = event.target;
     setFileName(file.name);
     setErrorMsg(null);
-    setFileData(null);
     setRawText('');
 
-    // 1. Text Types
     const textTypes = [
       'text/plain', 'application/json', 'text/markdown', 'text/csv', 'text/html'
     ];
-    
-    // 2. Binary Types supported by Gemini 2.5 inlineData
-    const supportedBinaryTypes = [
-      'application/pdf',
-      'image/png',
-      'image/jpeg',
-      'image/webp',
-      'image/heic',
-      'image/heif'
-    ];
 
-    // 3. Logic
-    const isText = textTypes.includes(file.type) || file.name.endsWith('.md') || file.name.endsWith('.txt');
-    const isSupportedBinary = supportedBinaryTypes.includes(file.type);
-    const isDocx = file.name.endsWith('.docx') || file.name.endsWith('.doc') || file.type.includes('wordprocessingml');
+    const lowerName = file.name.toLowerCase();
+    const isText = textTypes.includes(file.type) || lowerName.endsWith('.md') || lowerName.endsWith('.txt') || lowerName.endsWith('.json') || lowerName.endsWith('.csv') || lowerName.endsWith('.html');
+    const isPdf = file.type === 'application/pdf' || lowerName.endsWith('.pdf');
+    const isDocx = lowerName.endsWith('.docx');
+    const isDoc = lowerName.endsWith('.doc');
 
-    if (isDocx) {
-      setErrorMsg("Word documents (.docx) cannot be analyzed directly. Please 'Save as PDF' and upload the PDF.");
+    if (isDoc) {
+      setErrorMsg("Legacy .doc files are not supported. Please save as .docx or PDF.");
       return;
     }
 
-    if (isText) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target?.result;
-        if (typeof content === 'string') setRawText(content);
-      };
-      reader.readAsText(file);
-    } else if (isSupportedBinary) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        const base64Data = result.split(',')[1];
-        setFileData({
-          mimeType: file.type,
-          data: base64Data
-        });
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setErrorMsg(`Unsupported file type: ${file.type}. Please use PDF, Images, or Text.`);
+    try {
+      if (isText) {
+        const text = await file.text();
+        setRawText(text);
+      } else if (isDocx) {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        const text = result.value || '';
+        if (!text.trim()) {
+          setErrorMsg("No readable text found in the DOCX. Try exporting as PDF or text.");
+          return;
+        }
+        setRawText(text);
+      } else if (isPdf) {
+        const arrayBuffer = await file.arrayBuffer();
+        const text = await extractPdfText(arrayBuffer);
+        if (!text.trim()) {
+          setErrorMsg("No readable text found in the PDF. Try exporting as text.");
+          return;
+        }
+        setRawText(text);
+      } else {
+        setErrorMsg("Unsupported file type. Please upload PDF, DOCX, or text.");
+      }
+    } catch (error) {
+      console.error(error);
+      setErrorMsg("Failed to read the file. Please try a text export or a simpler file.");
+    } finally {
+      input.value = '';
     }
-    
-    event.target.value = '';
   };
 
   const clearFile = () => {
-    setFileData(null);
     setFileName('');
     setRawText('');
     setErrorMsg(null);
@@ -106,7 +121,7 @@ export const ExperienceEditor: React.FC<ExperienceEditorProps> = ({
   // --- ACTIONS ---
 
   const handleParse = async () => {
-    if (!rawText.trim() && !fileData) return;
+    if (!rawText.trim()) return;
     if (!apiKey) { alert("Please configure API Key in Settings."); return; }
     
     setLoading(LoadingState.PARSING, t.common.loading);
@@ -115,9 +130,8 @@ export const ExperienceEditor: React.FC<ExperienceEditorProps> = ({
     try {
       // Use configured Model and Prompt
       const parsed = await parseMasterProfile(
-        fileData ? "" : rawText, 
+        rawText,
         apiKey,
-        fileData || undefined,
         apiBaseUrl,
         model,
         systemPrompt
@@ -249,14 +263,14 @@ export const ExperienceEditor: React.FC<ExperienceEditorProps> = ({
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900 tracking-tight">Upload Resume</h3>
                   <p className="text-gray-500 mt-2 max-w-lg mx-auto">
-                    PDF or Image recommended. 
-                    <br/><span className="text-xs text-gray-400">(DOCX not supported - please save as PDF)</span>
+                    DOCX, PDF, or text supported. 
+                    <br/><span className="text-xs text-gray-400">We extract text locally before sending to the AI.</span>
                   </p>
                 </div>
                 
                 {/* Upload Area */}
                 <div className="relative w-full group/drop">
-                  {fileData || rawText ? (
+                  {rawText ? (
                     <div className="p-1 bg-white rounded-2xl shadow-xl ring-1 ring-black/5 max-w-md mx-auto">
                        <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
                           <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center text-gray-600">
@@ -278,7 +292,7 @@ export const ExperienceEditor: React.FC<ExperienceEditorProps> = ({
                        <TextArea 
                         value={rawText}
                         onChange={(e) => { setRawText(e.target.value); setFileData(null); }}
-                        placeholder="Paste text directly, or upload a PDF..."
+                        placeholder="Paste resume text directly, or upload a file..."
                         className="min-h-[160px] bg-gray-50 border-gray-100 text-base pb-16 pt-6 px-6 text-center placeholder:text-gray-300"
                       />
                       <div className="absolute bottom-4 inset-x-0 flex justify-center">
@@ -287,7 +301,7 @@ export const ExperienceEditor: React.FC<ExperienceEditorProps> = ({
                               type="file" 
                               ref={fileInputRef} 
                               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" 
-                              accept=".pdf, .txt, .md, .json, .png, .jpg, .jpeg, .webp, .heic"
+                              accept=".pdf,.docx,.txt,.md,.json,.csv,.html"
                               onChange={handleFileUpload}
                             />
                             <Button 
@@ -313,7 +327,7 @@ export const ExperienceEditor: React.FC<ExperienceEditorProps> = ({
                 <div className="pt-6">
                   <Button 
                     onClick={handleParse} 
-                    disabled={(!rawText && !fileData) || loadingState !== LoadingState.IDLE}
+                    disabled={!rawText || loadingState !== LoadingState.IDLE}
                     isLoading={loadingState === LoadingState.PARSING}
                     className="h-12 px-10 text-base bg-blue-600 hover:bg-blue-700 text-white border-0 shadow-lg shadow-blue-500/30"
                     icon={<Wand2 className="w-5 h-5"/>}
@@ -356,7 +370,7 @@ export const ExperienceEditor: React.FC<ExperienceEditorProps> = ({
                   onClick={handleTailor}
                   disabled={!jobDescription || loadingState !== LoadingState.IDLE}
                   isLoading={loadingState === LoadingState.TAILORING}
-                  className="w-full h-12 bg-white text-indigo-600 hover:bg-indigo-50 border-0 shadow-lg font-bold"
+                  className="w-full h-12 shadow-lg font-bold"
                 >
                   {t.editor.buttons.tailor}
                 </Button>

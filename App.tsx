@@ -8,16 +8,16 @@ import { Button } from './components/UI';
 import { AppState, INITIAL_RESUME, LoadingState, ResumeData, SupportedLanguage, EducationItem } from './types';
 import { ArrowRight, Printer, RefreshCw, CheckCircle, Edit2, X, Sparkles, Shield, Cpu, MousePointer2 } from 'lucide-react';
 import { translations } from './utils/translations';
-import { DEFAULT_MODEL, DEFAULT_SYSTEM_PROMPT } from './services/geminiService';
+import { DEFAULT_MODEL, DEFAULT_SYSTEM_PROMPT } from './services/deepseekService';
 
 const App = () => {
   const [state, setState] = useState<AppState>({
     view: 'home',
     resumeData: INITIAL_RESUME,
     jobDescription: '',
-    targetLanguage: 'en', // Default UI Language
-    apiKey: localStorage.getItem('GEMINI_API_KEY') || process.env.API_KEY || '',
-    apiBaseUrl: localStorage.getItem('GEMINI_API_BASE_URL') || '',
+    targetLanguage: 'zh', // Default UI Language
+    apiKey: localStorage.getItem('DEEPSEEK_API_KEY') || process.env.DEEPSEEK_API_KEY || '',
+    apiBaseUrl: localStorage.getItem('DEEPSEEK_API_BASE_URL') || '',
     // Initialize with Defaults
     model: DEFAULT_MODEL,
     customPrompt: DEFAULT_SYSTEM_PROMPT,
@@ -30,8 +30,8 @@ const App = () => {
 
   // Persist API Key & Base URL
   useEffect(() => {
-    if (state.apiKey) localStorage.setItem('GEMINI_API_KEY', state.apiKey);
-    if (state.apiBaseUrl !== null) localStorage.setItem('GEMINI_API_BASE_URL', state.apiBaseUrl);
+    if (state.apiKey) localStorage.setItem('DEEPSEEK_API_KEY', state.apiKey);
+    if (state.apiBaseUrl !== null) localStorage.setItem('DEEPSEEK_API_BASE_URL', state.apiBaseUrl);
   }, [state.apiKey, state.apiBaseUrl]);
 
   const updateResumeData = (newData: Partial<ResumeData>) => {

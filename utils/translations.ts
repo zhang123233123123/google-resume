@@ -10,14 +10,14 @@ export const translations = {
     },
     home: {
       title: "Build your legacy.",
-      subtitle: "Transform unstructured career history into a world-class resume using Gemini AI Agents.",
+      subtitle: "Transform unstructured career history into a world-class resume using DeepSeek AI.",
       cta: "Start Building",
       features: {
-        ai: { title: "AI Powered", desc: "Powered by Gemini 2.5 Flash to understand complex career paths." },
+        ai: { title: "AI Powered", desc: "Powered by DeepSeek to understand complex career paths." },
         privacy: { title: "Privacy First", desc: "Your data is stored locally in your browser. No hidden servers." },
         edit: { title: "Live Editing", desc: "Click-to-edit preview for pixel-perfect final adjustments." }
       },
-      badge: "New: Gemini 2.5 Integration"
+      badge: "New: DeepSeek Integration"
     },
     profile: {
       title: "Personal Profile",
@@ -25,7 +25,10 @@ export const translations = {
       avatar: "Upload Photo",
       personal: "Personal Details",
       education: "Education History",
-      skills: "Skills & Expertise"
+      skills: "Skills & Expertise",
+      cropTitle: "Crop Photo",
+      cropHint: "Drag to reposition. Use the slider to zoom.",
+      cropZoom: "Zoom"
     },
     editor: {
       title: "Experience Parser",
@@ -41,7 +44,7 @@ export const translations = {
         parse: "Analyze & Extract Data",
         tailor: "Generate Tailored Resume",
         add: "Add Entry",
-        upload: "Upload File (All Formats)"
+        upload: "Upload File"
       }
     },
     settings: {
@@ -49,7 +52,7 @@ export const translations = {
       model: "AI Model",
       prompt: "System Prompt",
       promptDesc: "Customize the default instructions given to the AI Agent.",
-      modelDesc: "Select the Gemini model version (e.g., gemini-2.5-flash)."
+      modelDesc: "Select the DeepSeek model version (e.g., deepseek-chat)."
     },
     templates: {
       title: "Choose Template",
@@ -96,14 +99,14 @@ export const translations = {
     },
     home: {
       title: "Construisez votre héritage.",
-      subtitle: "Transformez votre carrière en un CV professionnel grâce à l'IA Gemini.",
+      subtitle: "Transformez votre carrière en un CV professionnel grâce à l'IA DeepSeek.",
       cta: "Commencer",
       features: {
-        ai: { title: "IA Puissante", desc: "Propulsé par Gemini 2.5 Flash pour comprendre les parcours complexes." },
+        ai: { title: "IA Puissante", desc: "Propulsé par DeepSeek pour comprendre les parcours complexes." },
         privacy: { title: "Confidentialité", desc: "Vos données sont stockées localement. Pas de serveurs cachés." },
         edit: { title: "Édition Live", desc: "Cliquez pour modifier l'aperçu pour des ajustements parfaits." }
       },
-      badge: "Nouveau : Intégration Gemini 2.5"
+      badge: "Nouveau : Intégration DeepSeek"
     },
     profile: {
       title: "Profil Personnel",
@@ -111,7 +114,10 @@ export const translations = {
       avatar: "Télécharger Photo",
       personal: "Détails Personnels",
       education: "Formation",
-      skills: "Compétences"
+      skills: "Compétences",
+      cropTitle: "Rogner la photo",
+      cropHint: "Faites glisser pour repositionner. Utilisez le curseur pour zoomer.",
+      cropZoom: "Zoom"
     },
     editor: {
       title: "Analyseur d'Expérience",
@@ -135,7 +141,7 @@ export const translations = {
       model: "Modèle IA",
       prompt: "Prompt Système",
       promptDesc: "Personnalisez les instructions données à l'agent IA.",
-      modelDesc: "Sélectionnez la version du modèle Gemini."
+      modelDesc: "Sélectionnez la version du modèle DeepSeek."
     },
     templates: {
       title: "Choisir un Modèle",
@@ -182,14 +188,14 @@ export const translations = {
     },
     home: {
       title: "Construa seu legado.",
-      subtitle: "Transforme sua história profissional em um currículo de classe mundial com Gemini AI.",
+      subtitle: "Transforme sua história profissional em um currículo de classe mundial com DeepSeek AI.",
       cta: "Começar",
       features: {
-        ai: { title: "IA Poderosa", desc: "Impulsionado pelo Gemini 2.5 Flash para entender carreiras complexas." },
+        ai: { title: "IA Poderosa", desc: "Impulsionado pelo DeepSeek para entender carreiras complexas." },
         privacy: { title: "Privacidade", desc: "Seus dados são armazenados localmente. Sem servidores ocultos." },
         edit: { title: "Edição ao Vivo", desc: "Clique para editar a visualização para ajustes perfeitos." }
       },
-      badge: "Novo: Integração Gemini 2.5"
+      badge: "Novo: Integração DeepSeek"
     },
     profile: {
       title: "Perfil Pessoal",
@@ -197,7 +203,10 @@ export const translations = {
       avatar: "Carregar Foto",
       personal: "Detalhes Pessoais",
       education: "Educação",
-      skills: "Habilidades"
+      skills: "Habilidades",
+      cropTitle: "Recortar Foto",
+      cropHint: "Arraste para reposicionar. Use o controle para zoom.",
+      cropZoom: "Zoom"
     },
     editor: {
       title: "Parser de Experiência",
@@ -221,7 +230,7 @@ export const translations = {
       model: "Modelo IA",
       prompt: "Prompt do Sistema",
       promptDesc: "Personalize as instruções padrão da IA.",
-      modelDesc: "Selecione a versão do modelo Gemini."
+      modelDesc: "Selecione a versão do modelo DeepSeek."
     },
     templates: {
       title: "Escolher Modelo",
@@ -268,14 +277,14 @@ export const translations = {
     },
     home: {
       title: "ابنِ إرثك.",
-      subtitle: "حول تاريخك المهني غير المنظم إلى سيرة ذاتية عالمية المستوى باستخدام Gemini AI.",
+      subtitle: "حول تاريخك المهني غير المنظم إلى سيرة ذاتية عالمية المستوى باستخدام DeepSeek AI.",
       cta: "ابدأ البناء",
       features: {
-        ai: { title: "مدعوم بالذكاء الاصطناعي", desc: "مدعوم بـ Gemini 2.5 Flash لفهم المسارات المهنية المعقدة." },
+        ai: { title: "مدعوم بالذكاء الاصطناعي", desc: "مدعوم بـ DeepSeek لفهم المسارات المهنية المعقدة." },
         privacy: { title: "الخصوصية أولاً", desc: "يتم تخزين بياناتك محليًا في متصفحك. لا خوادم مخفية." },
         edit: { title: "تحرير مباشر", desc: "انقر للتحرير في المعاينة لإجراء تعديلات دقيقة." }
       },
-      badge: "جديد: تكامل Gemini 2.5"
+      badge: "جديد: تكامل DeepSeek"
     },
     profile: {
       title: "الملف الشخصي",
@@ -283,7 +292,10 @@ export const translations = {
       avatar: "رفع صورة",
       personal: "البيانات الشخصية",
       education: "التعليم",
-      skills: "المهارات"
+      skills: "المهارات",
+      cropTitle: "اقتصاص الصورة",
+      cropHint: "اسحب لإعادة التموضع. استخدم شريط التكبير.",
+      cropZoom: "تكبير"
     },
     editor: {
       title: "محلل الخبرات",
@@ -307,7 +319,7 @@ export const translations = {
       model: "نموذج AI",
       prompt: "توجيه النظام",
       promptDesc: "تخصيص التعليمات الافتراضية للذكاء الاصطناعي.",
-      modelDesc: "حدد إصدار نموذج Gemini."
+      modelDesc: "حدد إصدار نموذج DeepSeek."
     },
     templates: {
       title: "اختر القالب",
@@ -354,14 +366,14 @@ export const translations = {
     },
     home: {
       title: "打造你的职业传奇。",
-      subtitle: "利用 Gemini AI 智能体将散乱的职业经历转化为世界级简历。",
+      subtitle: "利用 DeepSeek AI 智能体将散乱的职业经历转化为世界级简历。",
       cta: "开始构建",
       features: {
-        ai: { title: "AI 驱动核心", desc: "搭载 Gemini 2.5 Flash，深度理解复杂职业路径。" },
+        ai: { title: "AI 驱动核心", desc: "搭载 DeepSeek，深度理解复杂职业路径。" },
         privacy: { title: "隐私优先", desc: "数据纯本地存储于浏览器，无隐形服务器上传。" },
         edit: { title: "所见即所得", desc: "预览页支持点击直接编辑，像素级调整最终效果。" }
       },
-      badge: "新功能: Gemini 2.5 集成"
+      badge: "新功能: DeepSeek 集成"
     },
     profile: {
       title: "个人资料",
@@ -369,7 +381,10 @@ export const translations = {
       avatar: "上传头像",
       personal: "个人信息与自我评价",
       education: "教育经历",
-      skills: "技能特长"
+      skills: "技能特长",
+      cropTitle: "裁剪头像",
+      cropHint: "拖动调整位置，滑动缩放。",
+      cropZoom: "缩放"
     },
     editor: {
       title: "经历解析器",
@@ -385,7 +400,7 @@ export const translations = {
         parse: "智能解析数据",
         tailor: "生成定制简历",
         add: "添加条目",
-        upload: "上传文件 (全格式支持)"
+        upload: "上传文件"
       }
     },
     settings: {
@@ -393,7 +408,7 @@ export const translations = {
       model: "AI 模型",
       prompt: "系统提示词 (System Prompt)",
       promptDesc: "自定义 AI 智能体的默认指令。",
-      modelDesc: "选择 Gemini 模型版本 (例如 gemini-2.5-flash)。"
+      modelDesc: "选择 DeepSeek 模型版本 (例如 deepseek-chat)。"
     },
     templates: {
       title: "选择简历模版",
